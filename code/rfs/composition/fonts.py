@@ -40,6 +40,10 @@ FAMILY_FILES: dict[str, dict[bool, tuple[str, ...]]] = {
         False: ("calibri.ttf", "Calibri.ttf", "Carlito-Regular.ttf"),
         True: ("calibrib.ttf", "Calibri-Bold.ttf", "Carlito-Bold.ttf"),
     },
+    "comic sans ms": {
+        False: ("comic.ttf", "ComicSansMS.ttf"),
+        True: ("comicbd.ttf", "ComicSansMS-Bold.ttf"),
+    },
 }
 
 # Last resort.  DejaVu is installed almost everywhere but its metrics match
@@ -49,13 +53,13 @@ FALLBACK_FILES: dict[bool, tuple[str, ...]] = {
     True: ("DejaVuSans-Bold.ttf",),
 }
 
-DEFAULT_FAMILY = "arial"
+DEFAULT_FAMILY = "comic sans ms"
 
 # python-pptx builds the slide master, and PowerPoint paints a run that names
 # no family with the theme's minor font.  Decks we wrote before the compiler
 # named its headings rely on exactly that, so the theme font is the honest
 # default for them.
-THEME_FONT_FAMILY = "Calibri"
+THEME_FONT_FAMILY = "Comic Sans MS"
 
 _SUBSTITUTIONS: dict[tuple[str, bool], ResolvedFont] = {}
 
@@ -66,7 +70,7 @@ def _font_directories() -> list[Path]:
     if configured:
         directories.extend(Path(part) for part in configured.split(os.pathsep) if part)
     if sys.platform.startswith("win"):
-        windir = os.environ.get("WINDIR") or "<PATH>"
+        windir = os.environ.get("WINDIR") or "C:/Windows"
         directories.append(Path(windir) / "Fonts")
     directories.extend(
         Path(path).expanduser()
@@ -155,7 +159,7 @@ def body_font_family(style: dict | None) -> str:
     """Family the compiler draws node labels, connector labels and captions with."""
 
     block = style if isinstance(style, dict) else {}
-    return str(block.get("font_family") or "").strip() or "Arial"
+    return str(block.get("font_family") or "").strip() or THEME_FONT_FAMILY
 
 
 def font_substitutions() -> list[dict[str, object]]:

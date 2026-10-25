@@ -539,7 +539,7 @@ def compile_ppt(program: dict, out_dir: str | Path) -> Path:
             font_size=float(node.get("font_size_pt") or 16),
             bold=bool(node.get("bold", True)),
             color=str(node.get("text_color") or node.get("stroke_color") or "#163B4D"),
-            font_family=str(node.get("font_family") or "Arial"),
+            font_family=str(node.get("font_family") or "") or _body_family(program),
         )
         label_rendered_as = "node_shape_text"
         if isinstance(label_bbox, dict):
@@ -584,7 +584,7 @@ def compile_ppt(program: dict, out_dir: str | Path) -> Path:
             font_size=float(node.get("font_size_pt") or 16),
             bold=bool(node.get("bold", True)),
             color=str(node.get("text_color") or node.get("stroke_color") or "#163B4D"),
-            font_family=str(node.get("font_family") or "Arial"),
+            font_family=str(node.get("font_family") or "") or _body_family(program),
         )
 
     # Slot image layer and editable captions.

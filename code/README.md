@@ -43,8 +43,10 @@ wave-after-wave loop and is not started automatically.
 
 ## Default typeface
 
-This tree compiles with Arial (theme font Calibri). Comic Sans MS appears only in
-later development builds.
+This tree compiles with Comic Sans MS: `DEFAULT_FAMILY = "comic sans ms"` and
+`THEME_FONT_FAMILY = "Comic Sans MS"` in `rfs/composition/fonts.py`. A machine
+without the font records the substitution in `font_substitutions()` rather than
+silently painting with something else.
 
 ## License
 

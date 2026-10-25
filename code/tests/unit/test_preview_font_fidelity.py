@@ -67,7 +67,20 @@ class FontResolutionTests(unittest.TestCase):
         self.assertEqual(fonts.heading_font_family(style), "Georgia")
         self.assertEqual(fonts.body_font_family(style), "Arial")
         self.assertEqual(fonts.heading_font_family({}), fonts.THEME_FONT_FAMILY)
-        self.assertEqual(fonts.body_font_family({}), "Arial")
+        self.assertEqual(fonts.body_font_family({}), "Comic Sans MS")
+
+    def test_default_runs_use_comic_sans_ms(self):
+        program = _panel_program()
+        program["canvas"] = {"width_in": 13.333, "height_in": 7.5, "ratio": 16 / 9, "background": "#FFFFFF"}
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            compile_ppt(program, out)
+            with zipfile.ZipFile(out / "editable_composition.pptx") as deck:
+                xml = deck.read("ppt/slides/slide1.xml").decode("utf-8")
+        runs = xml.split("<a:r>")[1:]
+        self.assertTrue(runs)
+        for run in runs:
+            self.assertIn('typeface="Comic Sans MS"', run, run[:200])
 
 
 class PreviewFontFidelityTests(unittest.TestCase):

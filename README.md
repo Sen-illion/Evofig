@@ -51,8 +51,9 @@ Wave-after-wave evolution across a fixed paper set is a separate command,
 
 ## Notes
 
-- Default typeface in this tree is **Arial** (theme font Calibri). Comic Sans MS exists only
-  in later development builds and is not what produced the reported figures.
+- Default typeface in this tree is **Comic Sans MS** (`DEFAULT_FAMILY` and
+  `THEME_FONT_FAMILY` in `rfs/composition/fonts.py`). Every run names its family, so a
+  machine without the font reports the substitution instead of silently falling back.
 - Fonts, arrows, panels and labels are compiled as editable PowerPoint objects; raster
   assets carry only local icons.
 - The `Qwen3.5-9B` base model is not redistributed. Download it separately and load

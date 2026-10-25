@@ -175,7 +175,7 @@ def build_semantic_figure_program(
         "style": {
             "palette": ["#2A63A1", "#1F756F", "#62529A", "#B15C21", "#427E50"],
             "arrow_weight_pt": 1.7,
-            "font_family": "Arial",
+            "font_family": THEME_FONT_FAMILY,
             # Titles, subtitles and panel headings are painted with the deck's
             # theme font; naming it here is what lets the preview draw the same
             # glyph widths the compiled deck will use.

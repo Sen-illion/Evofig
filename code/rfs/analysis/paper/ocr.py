@@ -203,7 +203,7 @@ def _nearest_target(bbox: dict[str, float], program: dict) -> tuple[str, str]:
 def _font_family_guess(text: str) -> str:
     if any(ord(char) > 127 for char in text):
         return "Microsoft YaHei"
-    return "Arial"
+    return "Comic Sans MS"
 
 
 def _normalize_quad(quad: Any) -> list[list[float]] | None:
