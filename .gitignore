@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets and local credentials
+.env
+.env.*
+*.pem
+*.key
+
+# Local run products
+output/
+outputs/
+.test-tmp/
+datasets/
+models/
+judge_training_runs/
+abl/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# This release intentionally tracks figures, PPTX case studies and prompt PDFs.
+# Do not add blanket *.pdf, *.pptx or *.png rules here.

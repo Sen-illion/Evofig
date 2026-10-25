@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use EvoFig, please cite this artifact."
+title: "EvoFig: PPTX-first paper-to-framework-figure generation with bounded self-evolution"
+type: software
+authors:
+  - name: "The EvoFig Authors"
+version: 1.0.0
+date-released: "2026-10-25"
+license: MIT
+repository-code: "https://github.com/Sen-illion/Evofig"
+abstract: >-
+  Reference implementation and released evidence for EvoFig, a PPTX-first
+  pipeline that turns a paper into an editable framework figure and improves it
+  through a bounded self-evolution loop.
+keywords:
+  - scientific figure generation
+  - editable PowerPoint
+  - self-evolution
+  - paper-to-figure
+  - multimodal evaluation
+

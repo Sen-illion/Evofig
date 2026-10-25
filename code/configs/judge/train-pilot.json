@@ -1,0 +1,27 @@
+{
+ "backend": "transformers",
+ "base_model": "<DATA_ROOT>/models/Qwen3.5-35B-A3B",
+ "load_in_4bit": true,
+ "gradient_checkpointing": true,
+ "lora_r": 16,
+ "lora_alpha": 32,
+ "lora_dropout": 0.05,
+ "lora_target_modules": [
+  "q_proj",
+  "k_proj",
+  "v_proj",
+  "o_proj",
+  "gate_proj",
+  "up_proj",
+  "down_proj"
+ ],
+ "beta": 0.1,
+ "learning_rate": 0.000005,
+ "epochs": 1,
+ "gradient_accumulation": 8,
+ "max_length": 4096,
+ "seed": 0,
+ "max_steps": 8,
+ "save_every": 4,
+ "resume_from": ""
+}

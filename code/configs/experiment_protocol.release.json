@@ -1,0 +1,487 @@
+{
+  "_release_note": {
+    "what": "Path-independent copy of configs/experiment_protocol.json. Every scientific switch (models, seeds, judge seats, scoring, arm deltas) is unchanged; only machine paths were replaced.",
+    "run_dir": "<RUN_DIR> names the local directory the ablation driver writes to (lists, public inputs, per-arm outputs). Create it and point data.*.list there.",
+    "judge_base_model": "Qwen3.5-9B is the base model; obtain it separately. weights/judge-choice9b-sft-aesthetic-step-003174/adapter is the LoRA adapter shipped in this repository.",
+    "dev_copy": "experiment_protocol.json is the development copy and keeps <DATA_ROOT>/<HOST> placeholders; this file is the one to read for reproduction."
+  },
+  "schema": "rfs.experiment-protocol",
+  "version": 1,
+  "frozen_on": "2026-10-06",
+  "prose": "docs/experiment-plan-2026-10-06.md",
+  "note": "One machine-readable protocol for the main experiment and the four supplementary ones. Every run that belongs to this plan reads its switches from here; a driver must not carry any of them of its own. A run records this file's sha256, so editing the protocol cannot silently change what an arm that already ran meant.",
+  "seed": 1729,
+  "data": {
+    "own_500": {
+      "manifest": "benchmarks/editable-figure-bench/manifest/own_500.jsonl",
+      "report": "benchmarks/editable-figure-bench/manifest/own_500_report.json",
+      "size": 500,
+      "per_domain": 100,
+      "sampled": "Random(1729) over benchmarks/editable-figure-bench/manifest/benchmark_1500.jsonl"
+    },
+    "de25": {
+      "source": "own_500",
+      "size": 25,
+      "per_domain": 5,
+      "stride": 20,
+      "seed": 1729,
+      "list": "<RUN_DIR>/abl/de25.jsonl",
+      "note": "The one paper set both inference-budget axes run on: every twentieth row of own_500, which is blocked by domain, so a stride lands five papers in each of the five domains. The two machines derive it from their own copy of the list and are checked to name the same 25 papers. None of the 25 sits in the Judge holdout, so no arm has to drop a paper to stay on the same set.",
+      "checked_against_holdout": "0 of 25"
+    },
+    "sciflow": {
+      "source": "official",
+      "split": "official",
+      "size": 500,
+      "list": "<RUN_DIR>/abl/sciflow_500.jsonl",
+      "report": "<RUN_DIR>/abl/sciflow_500_report.json",
+      "inputs": "<RUN_DIR>/abl/public_inputs/sciflow",
+      "note": "scored with SciFlow's own node / edge / text / image metrics; built by scripts/build_public_lists.py, which stages each paper under inputs/"
+    },
+    "figurebench": {
+      "source": "official",
+      "split": "test",
+      "size": 300,
+      "list": "<RUN_DIR>/abl/figurebench_300.jsonl",
+      "report": "<RUN_DIR>/abl/figurebench_300_report.json",
+      "inputs": "<RUN_DIR>/abl/public_inputs/figurebench",
+      "dev_size": 3000,
+      "note": "dev is never generated; scored with FigureBench's own VLM groups; a row is named after its position in the test split, which is how that split's scorer addresses it"
+    },
+    "judge_holdout": {
+      "note": "the same five exam lists on both machines, under the tree each one mounts; a run reads its own host's list and never the other machine's path, which would not exist there",
+      "overlap_list_on_experiment_host": "<RUN_DIR>/abl/holdout_overlap.txt",
+      "overlap_papers": 11,
+      "generated_size": 500,
+      "evaluated_size": 489,
+      "size_note": "the row generates all 500 papers of the list; the eleven whose figures overlap the Judge exam are run like the rest and left out of the paired table, which is where the 489 denominator belongs. A file that calls the row itself 489 is describing the denominator, not the run."
+    }
+  },
+  "models": {
+    "vlm": "gemini-3.1-flash-lite",
+    "image": "gemini-3.1-flash-lite-image",
+    "nine_judge": "gemini-3.1-flash-lite",
+    "nine_prompt": "nine-v001",
+    "judge_base_model": "Qwen3.5-9B",
+    "judge_checkpoint": "weights/judge-choice9b-sft-aesthetic-step-003174/adapter"
+  },
+  "generation": {
+    "planner_mode": "vlm",
+    "read_mode": "full",
+    "_read_mode_note": "How much of the paper is read before the figure is planned. `full` is what every row reads from 2026-10-10: a review pass of its own first, then a planning call handed the reference images and a wider evidence budget. The rows measured before that read `fast` -- one planning call over a shortened evidence budget and no reference image -- which is what left the method inventory with three or four unnamed modules and the same nine names repeated over the storyline, the must-show list and the required labels, so the shared block moved. It is a different call set, so a row that deliberately reads `fast` must not be compared against these without saying so.",
+    "method_mode": "vlm",
+    "structure_mode": "vlm",
+    "text_plan_mode": "vlm",
+    "ppt_plan_mode": "vlm",
+    "color_theme_mode": "vlm",
+    "visual_review_mode": "vlm",
+    "reference_mode": "heuristic",
+    "icon_mode": "image2",
+    "graph_context": "on",
+    "middle_layer": "on",
+    "figure_target": "overview",
+    "domain_profile": "auto",
+    "aspect_ratio": "16:9",
+    "max_rounds": 1,
+    "_rounds_note": "One round, not three. The repair loop was measured on the 2026-10-07 probe: the same five papers, three rounds each, scored with the nine-item ruler -- no item and no official metric beat its own round_00 by anything that run can tell apart, and every delivered deck was byte-identical to round_00. Three rounds therefore spend about two thirds of each paper's wall clock to hand back the same figure. Axis B (repair rounds) is read from that 26-figure comparison, because this row no longer writes round_01 or round_02.",
+    "candidates_per_round": 1,
+    "icon_candidates": 1,
+    "vlm_timeout": 300,
+    "vlm_retries": 2,
+    "evolution_enabled": true,
+    "evolution_scope": "joint",
+    "experience_enabled": true,
+    "judge_mode": "vlm",
+    "reference_top_k": 5,
+    "reference_library": "",
+    "reuse_replayed_icons": "on"
+  },
+  "judge": {
+    "advisory_checkpoint": "weights/judge-choice9b-sft-aesthetic-step-003174/adapter",
+    "advisory_base_model": "Qwen3.5-9B",
+    "acceptance_checkpoint": "weights/judge-choice9b-sft-aesthetic-step-003174/adapter",
+    "acceptance_base_model": "Qwen3.5-9B",
+    "note": "Both seats name the same trained weights, which is what the live product configuration does. A seeded checkpoint replaces the class judge_mode would have picked, so judge_mode only states the fallback and never claims a vendor model judged anything. An arm may blank either path in its own judge block to run the rule seats instead; the driver refuses a Judge key it does not know, and stamps such a row judge_seats=heuristic, because a row measured by the rules is not a comparable column with one measured by the trained Judge.",
+    "reads": [
+      "judge_role",
+      "acceptance_judge_role"
+    ],
+    "round_record_reads": [
+      "trained",
+      "checkpoint"
+    ],
+    "injectable_statuses": [
+      "same_domain_validated",
+      "cross_domain_validated",
+      "domain_validated",
+      "promoted"
+    ],
+    "never_injectable_statuses": [
+      "current_case_validated"
+    ]
+  },
+  "runtime_env": {
+    "MODEL_VLM": "gemini-3.1-flash-lite",
+    "RFS_IMAGE_MODEL": "gemini-3.1-flash-lite-image",
+    "GEMINI_GEN_IMG_URL": "https://<API_HOST>/v1beta/models/gemini-3.1-flash-lite-image:generateContent",
+    "RFS_SCORE_MODEL": "gemini-3.1-flash-lite",
+    "RFS_PREVIEW_RENDER": "auto",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "RFS_VLM_RATE_LIMIT_SLEEP_SECONDS": "30",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "_note": "The two machines share one set of API credentials, so both tracks sit out a rate limit for the same 30 seconds instead of retrying into it. Keys that start with an underscore are prose, not environment variables.",
+    "_models": "The three model names are exported here rather than left to each machine's .env, which is a credential file and had drifted: it still named gemini-3-pro-preview for text and z-image-turbo for icons, neither of which is what the models block above states. Exported last, these win over the file, so every arm and every scoring call reads the same ruler on both machines, and the models block describes what actually runs instead of what somebody intended. The icon name is gemini-3.1-flash-lite-image: the model the rows already measured were drawn with, and the one the approved budget plan names. A switch to z-image-turbo stood here from 2026-10-07 23:56 until 2026-10-08. It is roughly a seventeenth of the price and icons are the largest line in a paper's cost, so it is worth making deliberately -- but only for every row at once: the best-of-N arm that ran before the switch and the two that ran after it are two different rulers, their difference is not the axis, and the arms drawn under z-image are being re-run.",
+    "_image_endpoint": "GEMINI_GEN_IMG_URL is exported for the same reason and is the icon call's host, not just its model: the provider module builds `/v1beta/models/<model>:generateContent` under this URL's host and ignores its path. Both machines' .env files point it at <API_HOST>, which no longer resolves to anything reachable from either of them (2026-10-07: HTTP 000, the name answers with an unrelated IPv6 address), so every icon request died as `Network is unreachable` after the text calls had already been paid for. <API_HOST> is the same host the text and scoring calls already use, and it serves gemini-3.1-flash-lite-image: a probe returned HTTP 200 with inline image data. This pins the host in the protocol instead of editing either credential file. It is not read at all while the icon model is not a Gemini one: the icon module then posts to {API_BASE}/images/generations, so that route's host comes from the credential file's API_BASE -- <API_HOST>/v1 on both machines -- and this entry stays here only so that a switch back to a Gemini image model lands on a host that answers.",
+    "_memory": "PYTORCH_CUDA_ALLOC_CONF turns on expandable segments. A judge seat's own report of running out of memory showed 12.4 GB of an 80 GB card held as reserved-but-unallocated on top of 43.3 GB actually in use: fragmentation, not model weight. It is exported here for the same reason the model names are, so that both machines run the same caching behaviour instead of whatever their shells happen to carry.",
+    "_icon_ruler": "The rows are drawn under two icon models on purpose. The protocol-wide RFS_IMAGE_MODEL is the ruler the D/E axis arms were already measured with, and those rows are re-run under it rather than mixed. The main-table and ablation rows this family owns (full, no_evolve, no_middle_layer, unit_cost, ours_own500, ours_sciflow, ours_figurebench) carry an `env` block that names z-image-turbo instead: roughly a seventeenth of the price, and icons are the largest line in a paper's cost. An arm's snapshot records the block under `env_overrides`, so a reader can tell which ruler a delivery was drawn under instead of assuming the protocol-wide one.",
+    "_scoring": "RFS_SCORE_MODEL is the ruler both scoring paths read with; the nine-item scale is switched on per scoring command (benchmark score-own --nine-judge api) rather than exported here, because a generation run has no business scoring itself."
+  },
+  "scoring": {
+    "editable": {
+      "kind": "deterministic",
+      "reads": [
+        "raster_area_ratio",
+        "native_object_count"
+      ]
+    },
+    "nine": {
+      "judge": "gemini-3.1-flash-lite",
+      "prompt": "nine-v001",
+      "primary": [
+        "accuracy",
+        "completeness"
+      ],
+      "judge_note": "every vendor model this plan scores with reads through RFS_SCORE_MODEL (default gemini-3.1-flash-lite), shared by the nine-item scale and PaperQuiz, rather than MODEL_VLM, so a generation-side model swap cannot move the scores; scores written before 2026-10-07 used gemini-3-pro-preview and are a different ruler, not a comparable column"
+    },
+    "contract_metrics_on_own_500": false,
+    "contract_metrics_note": "modules, edges and must_not_invent stay out: the contract is the generation input and cannot also be the answer",
+    "render": "preview.png from the delivered pptx; a paper with no preview is left blank, never scored 0",
+    "missing_value": "blank",
+    "statistics": "paired bootstrap 95 percent interval at the paper level; a paper that is blank in one column drops only that pair",
+    "cost": {
+      "source": "paper_evolve_editable_report.json cost block, copied to cost_report.json beside it",
+      "keeps": [
+        "input_tokens",
+        "output_tokens",
+        "icon_calls",
+        "wall_clock_seconds"
+      ],
+      "generation_and_scoring_are_separate_lines": true,
+      "failed_papers": "counted separately, never as 0 and never inside a median"
+    }
+  },
+  "arms": [
+    {
+      "id": "full",
+      "label": "完整",
+      "row_of": "experiment-1",
+      "driver": "waves",
+      "status": "awaiting_go",
+      "status_note": "equal to the main experiment Ours own-set row. It runs in waves: a group of papers shares one library snapshot, whatever the group earned is promoted at the group's end, and the next group reads that. Not started, and the reason is still the library: nothing is promoted in it, so the first wave would read an empty shelf and the row would be indistinguishable from no_evolve.",
+      "papers": "own_500",
+      "wave_size": 50,
+      "experience_library": "host",
+      "validation_suite": "host",
+      "require_holdout": true,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {}
+    },
+    {
+      "id": "no_evolve",
+      "label": "没有自进化链路",
+      "row_of": "experiment-1",
+      "driver": "waves",
+      "status": "awaiting_go",
+      "status_note": "the library does not grow: one frozen snapshot is read and nothing is promoted. Same driver and same wave size as the full row, so the ladder is the only difference between the two.",
+      "papers": "own_500",
+      "wave_size": 50,
+      "experience_library": "host",
+      "validation_suite": "",
+      "require_holdout": true,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {
+        "validate": false
+      },
+      "cli": [
+        "--no-validate"
+      ]
+    },
+    {
+      "id": "no_memory",
+      "label": "没有经验库（10-04 规则版批次）",
+      "row_of": "experiment-1",
+      "driver": "none",
+      "status": "free",
+      "status_note": "read from the 2026-10-04 batch rather than run again, which is the user's call. That batch is the rule-version pipeline, not the product configuration: both Judge seats heuristic (trained false), two candidates per round, and about four icon calls per paper where the product configuration makes forty. The gap between this row and the full row therefore mixes the library with those switches and cannot be attributed to the library alone; the table footnote has to say so. Summarised by scripts/summarise_legacy_row.py.",
+      "reads": "10-04 batch: generations <RUN_DIR>/efb_runs/own500_gemini_flash_image, scores <RUN_DIR>/efb_score/own_final and own_round00",
+      "papers": "own_500"
+    },
+    {
+      "id": "no_memory_product",
+      "label": "没有经验库（读主实验那批）",
+      "row_of": "experiment-1",
+      "driver": "none",
+      "status": "free",
+      "reads": "ours_own500's deliveries: the product configuration against a library with nothing promoted, where the retrieval path has nothing to inject, so the two rows hand back the same figure. That holds only while the library is empty -- the moment an entry is promoted this row has to be run on its own.",
+      "status_note": "not a run of its own any more: with an empty library the product configuration and the no-memory configuration deliver the same figure, so running it separately would buy the same pixels twice. The 10-04 batch it used to be measured against stays out of the table.",
+      "papers": "own_500"
+    },
+    {
+      "id": "no_middle_layer",
+      "label": "没有中间层",
+      "row_of": "experiment-1",
+      "driver": "waves",
+      "status": "awaiting_go",
+      "status_note": "this row removes the paper's explicit structure: --middle-layer off stops the run building the scientific graph, its subgraphs and the scientific hierarchy plan while it plans, so the figure is planned from the method contract alone. The graph is rebuilt once the design exists, purely as the measurement the Grounding Gate and the alignment reports are computed against, which is why the repair loop is not a second difference between this row and the full one. graph_context is reported as not_applicable here; the weaker --graph-context switch is kept only as a regression anchor and is no longer a row of its own. Driver, wave size, library and holdout match the full row. It also reads the reference library the host files, the same 65-figure gallery the full row reads, so the panel lay-out is planned against the same precedent. validate is off because this host names no validation suite (hosts.experiment.validation_suite is empty) and the library is empty, so promoting would change nothing; a suite has to exist before this row can be read as a self-evolution row rather than as full minus the explicit structure. The row saves exactly one planning call per paper: the graph and its subgraphs are deterministic and cost nothing. This is the draft-only half of the two-stage split: judge_mode heuristic with both seats' checkpoints blanked, evolution off and experience off. Nothing the seats ever said was applied -- every delivery this row wrote is the round's own drawing, the same figure a run with the seats on hands back -- so the round stops paying for two 9B seats it never acted on, and a card carries up to four papers instead of two. The iteration rounds are added afterwards on the finished decks, by paper-evolve-continuous.",
+      "papers": "own_500",
+      "wave_size": 50,
+      "experience_library": "host",
+      "reference_library": "host",
+      "validation_suite": "host",
+      "require_holdout": true,
+      "concurrency": 16,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {
+        "middle_layer": "off",
+        "validate": false,
+        "judge_mode": "heuristic",
+        "evolution_enabled": false,
+        "experience_enabled": false
+      },
+      "judge": {
+        "advisory_checkpoint": "",
+        "acceptance_checkpoint": ""
+      }
+    },
+    {
+      "id": "no_repair",
+      "label": "无修复",
+      "row_of": "experiment-1",
+      "driver": "none",
+      "status": "free",
+      "status_note": "not run on its own: read round_00 under the full arm's deliveries",
+      "reads": "full round_00"
+    },
+    {
+      "id": "unit_cost",
+      "label": "成本标定小样",
+      "row_of": "experiment-2",
+      "driver": "editable",
+      "status": "runnable",
+      "status_note": "the 20-paper sample that measures the product configuration's real price per paper; it is a calibration, not an ablation row",
+      "papers": "own_500",
+      "experience_library": "host",
+      "require_holdout": false,
+      "limit": 20,
+      "stride": 25,
+      "concurrency": 4,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {}
+    },
+    {
+      "id": "ours_own500",
+      "label": "主实验 · Ours · 自建集 500",
+      "row_of": "experiment-main",
+      "driver": "waves",
+      "status": "awaiting_go",
+      "status_note": "The main experiment's own-set row: the product configuration reading the library this host files, which has nothing promoted in it, so the retrieval path has nothing to inject and the row is also the no-memory row -- no_memory_product reads these deliveries instead of running. Driver, wave size, library and holdout match the self-evolution rows, so the ladder is the only difference between them. It also reads the reference library the host files -- 65 framework figures the user picked themselves -- so its planner gets the exemplar brief the retrieval-depth arms read rather than planning with no precedent. validate is off because this host names no validation suite (hosts.experiment.validation_suite is empty) and an empty library has nothing to promote. This is the draft-only half of the two-stage split: judge_mode heuristic with both seats' checkpoints blanked, evolution off and experience off. Nothing the seats ever said was applied -- every delivery this row wrote is the round's own drawing, the same figure a run with the seats on hands back -- so the round stops paying for two 9B seats it never acted on, and a card carries up to four papers instead of two. The iteration rounds are added afterwards on the finished decks, by paper-evolve-continuous.",
+      "papers": "own_500",
+      "wave_size": 50,
+      "experience_library": "host",
+      "reference_library": "host",
+      "validation_suite": "",
+      "require_holdout": true,
+      "concurrency": 16,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {
+        "validate": false,
+        "judge_mode": "heuristic",
+        "evolution_enabled": false,
+        "experience_enabled": false
+      },
+      "judge": {
+        "advisory_checkpoint": "",
+        "acceptance_checkpoint": ""
+      }
+    },
+    {
+      "id": "ours_sciflow",
+      "label": "主实验 · Ours · SciFlow",
+      "row_of": "experiment-main",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "our mechanism on the public SciFlow 500, scored with SciFlow's own metrics. It runs paper by paper rather than as an evolve session, because that is the configuration the external systems are compared against; its list comes from scripts/build_public_lists.py figure_target is paper: SciFlow scores the figure the paper printed, down to its panel granularity, so the design is aimed at the paper's own panels instead of the product overview.",
+      "papers": "sciflow",
+      "experience_library": "host",
+      "validation_suite": "",
+      "require_holdout": true,
+      "concurrency": 4,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {
+        "figure_target": "paper"
+      }
+    },
+    {
+      "id": "ours_figurebench",
+      "label": "主实验 · Ours · FigureBench",
+      "row_of": "experiment-main",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "our mechanism on the public FigureBench test 300, scored with FigureBench's own VLM groups; dev is never generated. Same driver and switches as the SciFlow row, one paper per row, figure_target paper included for the same reason.",
+      "papers": "figurebench",
+      "experience_library": "host",
+      "validation_suite": "",
+      "require_holdout": true,
+      "concurrency": 4,
+      "env": {
+        "RFS_IMAGE_MODEL": "z-image-turbo"
+      },
+      "overrides": {
+        "figure_target": "paper"
+      }
+    },
+    {
+      "id": "bestofn_1",
+      "label": "D · best-of-N · 每轮 1 版（基准，兼作另外三档的共享前缀）",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "The first rung of the inference-budget axis: one candidate per round, which is also the configuration the benchmark's own 500-paper batch was generated under. It doubles as the frozen prefix the other three rungs are measured against: they run with --replay-upstream-from pointing at this arm's directory for the same paper and --fork-before segmentation, so all four arms inherit one identical reading of the paper -- its extraction, method contract, scientific graph and relation explanations -- and differ only in how many candidates a round writes. Icons, design, theme, compilation and the repair loop are planned again in every arm, because the candidate count is what changes their cost; freezing them would make the axis measure nothing. No experience library: this axis asks how much a run spends per paper, not what it has learned.",
+      "papers": "de25",
+      "experience_library": "host",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false
+      }
+    },
+    {
+      "id": "bestofn_2",
+      "label": "D · best-of-N · 每轮 2 版",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "Two candidates a round instead of one, everything else equal to bestofn_1, whose reading of the paper this arm inherits. The second candidate is a different layout of the same accepted design, so the run still writes its own icons for whatever the new layout changes and re-compiles; the record of what it reused is in each paper's asset_generation_report.json.",
+      "papers": "de25",
+      "experience_library": "host",
+      "replay_from_arm": "bestofn_1",
+      "fork_before": "segmentation",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false,
+        "candidates_per_round": 2,
+        "reuse_replayed_icons": "off"
+      }
+    },
+    {
+      "id": "bestofn_3",
+      "label": "D · best-of-N · 每轮 3 版",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "Three candidates a round on the same 25 papers and the same inherited prefix as bestofn_2. Read as the pair bestofn_3 minus bestofn_1; the third rung exists because a curve through one and four alone cannot say whether the second candidate was most of the gain and the rest noise.",
+      "papers": "de25",
+      "experience_library": "host",
+      "replay_from_arm": "bestofn_1",
+      "fork_before": "segmentation",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false,
+        "candidates_per_round": 3,
+        "reuse_replayed_icons": "off"
+      }
+    },
+    {
+      "id": "bestofn_4",
+      "label": "D · best-of-N · 每轮 4 版",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "Four candidates a round, the code's own ceiling (CANDIDATE_ROUND_LIMIT is 4). This is the arm that costs the most and is therefore the one the price probe measures before the sweep is scaled. It also carries a check the other rungs do not need: its round_00 candidates are compared against each other, because a round whose candidates come out byte-identical would mean the axis is buying nothing on those papers.",
+      "papers": "de25",
+      "experience_library": "host",
+      "replay_from_arm": "bestofn_1",
+      "fork_before": "segmentation",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false,
+        "candidates_per_round": 4,
+        "reuse_replayed_icons": "off"
+      }
+    },
+    {
+      "id": "topk_5",
+      "label": "E · 检索深度 k=5（基准，兼作另外两档的共享前缀）",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "The first rung of the retrieval-depth axis and the product's own default: five exemplars drawn from the reference library, distilled into one style brief the planning and compilation prompts read. It doubles as the frozen prefix the other two rungs inherit, exactly as bestofn_1 does for its family, and it runs on hosts.main-de because the library lives on that machine and nothing else may write to the checkout the live self-evolution session reads. The library holds 30 positive records of which the framework-figure filter keeps about ten, so k=8 is at the edge of what the shelf can offer; a resolution record whose status is not `selected`, or whose framework count is below eight, stops the axis before it spends anything.",
+      "papers": "de25",
+      "experience_library": "host",
+      "reference_library": "host",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false
+      }
+    },
+    {
+      "id": "topk_3",
+      "label": "E · 检索深度 k=3",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "Three exemplars instead of five, on the same 25 papers and the same inherited prefix as topk_5. The exemplar brief the library produces is deduplicated field by field, so a smaller k may hand the prompts the same rules the larger one does; that is what the free gate in front of this family measures, and if the two briefs come out the same the axis is reported as having no dose instead of being run.",
+      "papers": "de25",
+      "experience_library": "host",
+      "reference_library": "host",
+      "replay_from_arm": "topk_5",
+      "fork_before": "segmentation",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false,
+        "reference_top_k": 3,
+        "reuse_replayed_icons": "off"
+      }
+    },
+    {
+      "id": "topk_8",
+      "label": "E · 检索深度 k=8",
+      "row_of": "experiment-6",
+      "driver": "editable",
+      "status": "awaiting_go",
+      "status_note": "Eight exemplars, the widest shelf the library can fill once data figures are filtered out. Many-shot work reports a gain that grows with the number of examples at a linearly growing inference cost; ours reads those examples through a distilled brief rather than raw, which is why the dose is measured before the arm is paid for. Read as the pair topk_8 minus topk_5.",
+      "papers": "de25",
+      "experience_library": "host",
+      "reference_library": "host",
+      "replay_from_arm": "topk_5",
+      "fork_before": "segmentation",
+      "require_holdout": true,
+      "concurrency": 4,
+      "overrides": {
+        "experience_enabled": false,
+        "reference_top_k": 8,
+        "reuse_replayed_icons": "off"
+      }
+    }
+  ]
+}

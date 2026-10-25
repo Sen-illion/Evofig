@@ -1,0 +1,1 @@
+"""ResearchFigureStudio test suite."""

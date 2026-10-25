@@ -1,0 +1,19 @@
+# Pinned stack for the Judge trainer (`rfs judge train`, and the train step of
+# `rfs judge handover`). Verified 2026-09-27 on the AutoDL box against
+# Qwen3.5-35B-A3B with 4-bit LoRA on 1 x RTX 4080 SUPER (32 GB).
+#
+# torch / torchvision must come from the cu124 wheel index; the pipeline itself
+# does not need them, so they are pinned here instead of in pyproject.toml.
+# torchvision is not called by rfs directly - the Qwen3VL image processor
+# imports it, and the run fails at load time without it.
+# The base conda python already ships an older torch; install into the same
+# environment that holds rfs, so `judge train` and the pipeline share one
+# interpreter.
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+torch==2.5.1+cu124
+torchvision==0.20.1+cu124
+transformers==5.17.0
+peft==0.21.0
+bitsandbytes==0.50.2
+accelerate==1.15.0

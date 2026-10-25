@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "research-figure-studio"
+version = "0.1.0"
+description = "PPTX-first research figure generation pipeline guided by papers and reference images."
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pillow",
+  "python-pptx",
+  "PyMuPDF",
+  "pypdfium2>=4.18",
+  "pypdf",
+  "pdfplumber",
+  "requests",
+  "opencv-python-headless",
+  "wordninja",
+  "pywin32; platform_system == 'Windows'"
+]
+
+[project.optional-dependencies]
+ocr = [
+  "rapidocr-onnxruntime",
+  "paddleocr",
+  "easyocr"
+]
+
+[project.scripts]
+rfs = "rfs.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rfs*"]
