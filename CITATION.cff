@@ -7,7 +7,6 @@ authors:
 version: 1.0.0
 date-released: "2026-10-25"
 license: MIT
-repository-code: "https://github.com/Sen-illion/Evofig"
 abstract: >-
   Reference implementation and released evidence for EvoFig, a PPTX-first
   pipeline that turns a paper into an editable framework figure and improves it
