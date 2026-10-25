@@ -12,6 +12,10 @@ load the same adapter, so one checkpoint covers both.
 first, or run `git lfs pull` after cloning; otherwise the file is a 130-byte
 pointer.
 
+If LFS is unavailable, the same adapter is mirrored at
+<https://anonymous-hf.com/a/vlcp5kd2fcr8/> (anonymous Hugging Face, blind-review
+link). Both copies are checkpoint `step-003174`.
+
 ## Not included
 
 - The `Qwen3.5-9B` base weights. They are 19 GB and are not redistributable here;

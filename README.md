@@ -23,6 +23,13 @@ python -m pip install -e code/
 rfs doctor --json
 ```
 
+The Judge adapter is also mirrored outside this repository, for readers who cannot
+resolve Git LFS or who reach the artifact through an anonymised link:
+
+**<https://anonymous-hf.com/a/vlcp5kd2fcr8/>** (anonymous Hugging Face mirror, blind-review link)
+
+Both copies are the same checkpoint (`step-003174`). Use either one.
+
 Python 3.10+. Generation needs provider credentials; none are included. See
 `code/configs/experiment_protocol.release.json` for the models, seeds and scoring switches
 the protocol names.
